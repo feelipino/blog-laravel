@@ -49,6 +49,6 @@ class CommentController extends Controller
         $comment->delete();
 
         return redirect()->route('posts.show', $post)
-            ->with('error', 'You are not authorized to delete this comment.');
+            ->with('success', 'Comentário excluído com sucesso.');
     }
 }
