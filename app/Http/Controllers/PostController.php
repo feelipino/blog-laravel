@@ -6,9 +6,13 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['index', 'show']);
+    }
+
     /**
      * Display a listing of the posts.
      * GET /posts
@@ -25,6 +29,7 @@ class PostController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Post::class);
         return view('posts.create');
     }
 
@@ -34,14 +39,12 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Post::class);
+
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
         ]);
-
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in to create a post.');
-        }
 
         // Create new post with the authenticated user
         $post = Auth::user()->posts()->create($validatedData);
@@ -58,7 +61,6 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $post->load(['user', 'comments.user']);
-
         return view('posts.show', compact('post'));
     }
 
@@ -79,7 +81,6 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $this->authorize('update', $post);
-
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',

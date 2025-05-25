@@ -10,19 +10,21 @@ use Illuminate\Support\Facades\Auth;
 class CommentController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Store a newly created comment in storage.
      * POST /posts/{post}/comments
      */
     public function store (Request $request, Post $post)
     {
-        $validatedData = $request->validate([
-            'description' => 'required|string|max:255',
-        ]);
+        $this->authorize('create', Comment::class);
 
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in to create a comment.');
-        }
+        $validatedData = $request->validate([
+            'description' => 'required|string|max:1000',
+        ]);
 
         $comment = new Comment($validatedData);
         $comment->user_id = Auth::id();
@@ -44,15 +46,7 @@ class CommentController extends Controller
     {
         $this->authorize('delete', $comment);
 
-        if (Auth::check() && Auth::id() === $comment->user_id /* || Auth::user()->isAdmin() */) {
-            $comment->delete();
-            return redirect()->route('posts.show', $post)
-                ->with('success', 'Comment deleted successfully.');
-        }
-
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in to delete a comment.');
-        }
+        $comment->delete();
 
         return redirect()->route('posts.show', $post)
             ->with('error', 'You are not authorized to delete this comment.');
