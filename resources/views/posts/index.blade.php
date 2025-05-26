@@ -2,36 +2,58 @@
 
 @section('content')
     <div class="container">
-        <h1>Posts</h1>
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1>Blog Posts</h1>
+            </div>
+            <div class="col-md-4 text-end">
+                @auth
+                    <a href="{{ route('posts.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> New Post
+                    </a>
+                @endauth
+            </div>
+        </div>
 
-        @auth
-            <a href="{{ route('posts.create') }}" class="btn btn-primary mb-3">Create New Post</a>
-        @endauth
-
-        @if (session('success'))
-            <div class="alert alert-success">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
-        @if($posts->isEmpty())
-            <p>No posts yet.</p> {{-- Changed from Portuguese to English --}}
-        @else
-            <ul class="list-group">
-                @foreach ($posts as $post)
-                    <li class="list-group-item">
-                        <h2><a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a></h2>
-                        {{-- Changed "Por:" to "By:" and ensured date format is common --}}
-                        <p><small>By: {{ $post->user->username }} on {{ $post->created_at->format('Y-m-d H:i') }}</small></p>
-                        <p>{{ Str::limit($post->description, 150) }}</p>
-                        <a href="{{ route('posts.show', $post) }}" class="btn btn-sm btn-info">View Post</a>
-                    </li>
-                @endforeach
-            </ul>
+        <div class="row">
+            @forelse($posts as $post)
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $post->title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                By {{ $post->user->name }} · {{ $post->created_at->diffForHumans() }}
+                            </h6>
+                            <p class="card-text">{{ Str::limit($post->description, 150) }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{{ route('posts.show', $post) }}" class="btn btn-sm btn-outline-primary">
+                                    Read more
+                                </a>
+                                <span class="text-muted">
+                                <i class="bi bi-chat-dots"></i> {{ $post->comments->count() }}
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        No posts found. Be the first to create a post!
+                    </div>
+                </div>
+            @endforelse
+        </div>
 
-            <div class="mt-3">
-                {{ $posts->links() }}
-            </div>
-        @endif
+        <div class="mt-4">
+            {{ $posts->links() }}
+        </div>
     </div>
 @endsection

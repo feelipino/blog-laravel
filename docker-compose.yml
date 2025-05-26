@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
     postgres:
-        image: postgres:15 # Pode especificar a versão do Postgres que desejar
-        container_name: meu_projeto_postgres
+        image: postgres:15
+        container_name: blog_laravel_postgres
         restart: always
         ports:
             - "5432:5432"

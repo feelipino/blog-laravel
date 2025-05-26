@@ -41,17 +41,15 @@ class PostController extends Controller
     {
         $this->authorize('create', Post::class);
 
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+        $validated = $request->validate([
+            'title' => 'required|string|min:3|max:255',
+            'description' => 'required|string|min:10',
         ]);
 
-        // Create new post with the authenticated user
-        $post = Auth::user()->posts()->create($validatedData);
+        $post = Auth::user()->posts()->create($validated);
 
-        // Redirect to the newly created post
         return redirect()->route('posts.show', $post)
-            ->with('success', 'Post created successfully.');
+            ->with('success', 'Post created successfully!');
     }
 
     /**
@@ -81,16 +79,16 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $this->authorize('update', $post);
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+
+        $validated = $request->validate([
+            'title' => 'required|string|min:3|max:255',
+            'description' => 'required|string|min:10',
         ]);
 
-        $post->update($validatedData);
+        $post->update($validated);
 
-        // Redirect to the updated post
         return redirect()->route('posts.show', $post)
-            ->with('success', 'Post updated successfully.');
+            ->with('success', 'Post updated successfully!');
     }
 
     /**

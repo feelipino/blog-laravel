@@ -18,21 +18,23 @@ class CommentController extends Controller
      * Store a newly created comment in storage.
      * POST /posts/{post}/comments
      */
-    public function store (Request $request, Post $post)
+    public function store(Request $request, Post $post)
     {
         $this->authorize('create', Comment::class);
 
-        $validatedData = $request->validate([
-            'description' => 'required|string|max:1000',
+        $validated = $request->validate([
+            'description' => 'required|string|min:3|max:1000',
         ]);
 
-        $comment = new Comment($validatedData);
+        $comment = new Comment([
+            'description' => $validated['description']
+        ]);
         $comment->user_id = Auth::id();
 
         $post->comments()->save($comment);
 
         return redirect()->route('posts.show', $post)
-            ->with('success', 'Comment created successfully.');
+            ->with('success', 'Comment added successfully!');
     }
 
     /**
@@ -49,6 +51,5 @@ class CommentController extends Controller
         $comment->delete();
 
         return redirect()->route('posts.show', $post)
-            ->with('success', 'Comentário excluído com sucesso.');
+            ->with('success', 'Comment deleted successfully.');
     }
-}
