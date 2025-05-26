@@ -205,7 +205,7 @@ This project uses Pest for PHP testing.
 * **Caching:** Application-level caching support (defaults to database driver).
 * **Session Management:** Robust session handling (defaults to database driver).
 * **RESTful API & Web Routes:** Structure for building both web interfaces and APIs.
-* **(Potentially) Basic Authentication:** If `laravel/breeze` or `laravel/ui` is scaffolded.
+* **Basic Authentication:**
 
 ---
 
